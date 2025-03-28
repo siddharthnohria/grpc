@@ -16,14 +16,6 @@
 
 #include <grpc/support/port_platform.h>
 
-#include <string>
-#include <utility>
-
-#include "src/core/lib/resource_quota/memory_quota.h"
-#include "src/core/lib/resource_quota/stream_quota.h"
-#include "src/core/lib/resource_quota/thread_quota.h"
-#include "src/core/util/ref_counted_ptr.h"
-
 namespace grpc_core {
 
 ResourceQuota::ResourceQuota(std::string name)
