@@ -98,6 +98,7 @@ grpc_http2_error_code Http2Settings::Apply(uint16_t key, uint32_t value) {
       enable_push_ = value != 0;
       break;
     case kMaxConcurrentStreamsWireId:
+      initial_max_concurrent_streams_ = value;
       max_concurrent_streams_ = value;
       break;
     case kInitialWindowSizeWireId:
