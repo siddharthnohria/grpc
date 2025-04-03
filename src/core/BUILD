@@ -90,7 +90,7 @@ grpc_cc_library(
         "absl/strings",
     ],
     visibility = [
-        "@grpc:event_engine_base_hdrs",
+        "//bazel:event_engine_base_hdrs",
     ],
     deps = [
         "memory_quota",
@@ -167,7 +167,7 @@ grpc_cc_library(
         "absl/log",
         "absl/strings",
     ],
-    visibility = ["@grpc:latent_see"],
+    visibility = ["//bazel:latent_see"],
     deps = [
         "per_cpu",
         "ring_buffer",
@@ -204,7 +204,7 @@ grpc_cc_library(
         "absl/status",
         "absl/status:statusor",
     ],
-    visibility = ["@grpc:alt_grpc_base_legacy"],
+    visibility = ["//bazel:alt_grpc_base_legacy"],
     deps = [
         "arena_promise",
         "call_finalization",
@@ -277,7 +277,7 @@ grpc_cc_library(
         "absl/strings",
     ],
     tags = ["nofixdeps"],
-    visibility = ["@grpc:grpc_experiments"],
+    visibility = ["//bazel:grpc_experiments"],
     deps = [
         "no_destruct",
         "//:config_vars",
@@ -300,7 +300,7 @@ grpc_cc_library(
         "absl/numeric:bits",
         "absl/strings",
     ],
-    visibility = ["@grpc:useful"],
+    visibility = ["//bazel:useful"],
     deps = ["//:gpr_platform"],
 )
 
@@ -1402,7 +1402,7 @@ grpc_cc_library(
     public_hdrs = [
         "handshaker/handshaker_factory.h",
     ],
-    visibility = ["@grpc:alt_grpc_base_legacy"],
+    visibility = ["//bazel:alt_grpc_base_legacy"],
     deps = [
         "channel_args",
         "iomgr_fwd",
@@ -1418,7 +1418,7 @@ grpc_cc_library(
     public_hdrs = [
         "handshaker/handshaker_registry.h",
     ],
-    visibility = ["@grpc:alt_grpc_base_legacy"],
+    visibility = ["//bazel:alt_grpc_base_legacy"],
     deps = [
         "channel_args",
         "handshaker_factory",
@@ -1601,7 +1601,7 @@ grpc_cc_library(
     ],
     external_deps = ["absl/log"],
     visibility = [
-        "@grpc:alt_grpc_base_legacy",
+        "//bazel:alt_grpc_base_legacy",
     ],
     deps = [
         "construct_destruct",
@@ -1686,7 +1686,7 @@ grpc_cc_library(
     ],
     external_deps = ["absl/strings"],
     visibility = [
-        "@grpc:alt_grpc_base_legacy",
+        "//bazel:alt_grpc_base_legacy",
     ],
     deps = [
         "memory_quota",
@@ -1752,7 +1752,7 @@ grpc_cc_library(
         "absl/log:check",
         "absl/strings",
     ],
-    visibility = ["@grpc:alt_grpc_base_legacy"],
+    visibility = ["//bazel:alt_grpc_base_legacy"],
     deps = [
         "slice_cast",
         "slice_refcount",
@@ -1794,7 +1794,7 @@ grpc_cc_library(
         "absl/strings",
         "absl/strings:str_format",
     ],
-    visibility = ["@grpc:alt_grpc_base_legacy"],
+    visibility = ["//bazel:alt_grpc_base_legacy"],
     deps = [
         "experiments",
         "gpr_spinlock",
@@ -1822,7 +1822,7 @@ grpc_cc_library(
         "absl/log:check",
         "absl/strings:str_format",
     ],
-    visibility = ["@grpc:alt_grpc_base_legacy"],
+    visibility = ["//bazel:alt_grpc_base_legacy"],
     deps = [
         "error",
         "gpr_manual_constructor",
@@ -1866,7 +1866,7 @@ grpc_cc_library(
     hdrs = [
         "lib/iomgr/iomgr_fwd.h",
     ],
-    visibility = ["@grpc:alt_grpc_base_legacy"],
+    visibility = ["//bazel:alt_grpc_base_legacy"],
     deps = ["//:gpr_platform"],
 )
 
@@ -2875,7 +2875,7 @@ grpc_cc_library(
         "lib/event_engine/channel_args_endpoint_config.h",
     ],
     external_deps = ["absl/strings"],
-    visibility = ["@grpc:alt_grpc_base_legacy"],
+    visibility = ["//bazel:alt_grpc_base_legacy"],
     deps = [
         "channel_args",
         "//:event_engine_base_hdrs",
@@ -2906,7 +2906,7 @@ grpc_cc_library(
         "lib/event_engine/event_engine_context.h",
     ],
     visibility = [
-        "@grpc:alt_grpc_base_legacy",
+        "//bazel:alt_grpc_base_legacy",
     ],
     deps = [
         "arena",
@@ -2925,7 +2925,7 @@ grpc_cc_library(
     ],
     external_deps = ["absl/functional:any_invocable"],
     visibility = [
-        "@grpc:alt_grpc_base_legacy",
+        "//bazel:alt_grpc_base_legacy",
     ],
     deps = [
         "channel_args",
@@ -3086,7 +3086,7 @@ grpc_cc_library(
     hdrs = [
         "lib/iomgr/socket_mutator.h",
     ],
-    visibility = ["@grpc:alt_grpc_base_legacy"],
+    visibility = ["//bazel:alt_grpc_base_legacy"],
     deps = [
         "channel_args",
         "useful",
@@ -3186,13 +3186,6 @@ grpc_cc_library(
         "slice",
         "strerror",
         "//:gpr",
-    ],
-)
-
-grpc_cc_library(
-    name = "http2_errors",
-    hdrs = [
-        "lib/transport/http2_errors.h",
     ],
 )
 
@@ -3328,7 +3321,7 @@ grpc_cc_library(
         "absl/strings:str_format",
     ],
     visibility = [
-        "@grpc:alt_grpc_base_legacy",
+        "//bazel:alt_grpc_base_legacy",
     ],
     deps = [
         "avl",
@@ -4780,7 +4773,7 @@ grpc_cc_library(
         "absl/strings",
         "absl/strings:str_format",
     ],
-    visibility = ["@grpc:json_reader_legacy"],
+    visibility = ["//bazel:json_reader_legacy"],
     deps = [
         "json",
         "match",
@@ -4897,7 +4890,7 @@ grpc_cc_library(
         "error",
         "exec_ctx_wakeup_scheduler",
         "experiments",
-        "http2_errors",
+        "http2_status",
         "idle_filter_state",
         "loop",
         "metadata_batch",
@@ -5632,7 +5625,7 @@ grpc_cc_library(
         "xds/grpc/xds_server_grpc_interface.h",
     ],
     tags = ["nofixdeps"],
-    visibility = ["@grpc:xds_client_core"],
+    visibility = ["//bazel:xds_client_core"],
     deps = [
         "channel_creds_registry",
         "//:ref_counted_ptr",
@@ -5755,7 +5748,7 @@ grpc_cc_library(
         "absl/strings",
     ],
     tags = ["nofixdeps"],
-    visibility = ["@grpc:xds_client_core"],
+    visibility = ["//bazel:xds_client_core"],
     deps = [
         "ref_counted",
         "useful",
@@ -6001,7 +5994,7 @@ grpc_cc_library(
         "absl/strings",
     ],
     tags = ["nofixdeps"],
-    visibility = ["@grpc:xds_client_core"],
+    visibility = ["//bazel:xds_client_core"],
     deps = [
         "channel_args",
         "channel_creds_registry",
@@ -6514,7 +6507,7 @@ grpc_cc_library(
     srcs = ["lib/transport/status_conversion.cc"],
     hdrs = ["lib/transport/status_conversion.h"],
     deps = [
-        "http2_errors",
+        "http2_status",
         "time",
         "//:gpr_platform",
         "//:grpc_public_hdrs",
@@ -6531,7 +6524,7 @@ grpc_cc_library(
     deps = [
         "error",
         "experiments",
-        "http2_errors",
+        "http2_status",
         "status_conversion",
         "status_helper",
         "time",
@@ -7541,10 +7534,23 @@ grpc_cc_library(
         "absl/strings",
     ],
     deps = [
-        "http2_errors",
+        "http2_status",
         "useful",
         "//:chttp2_frame",
         "//:gpr_platform",
+    ],
+)
+
+grpc_cc_library(
+    name = "http2_status",
+    hdrs = [
+        "ext/transport/chttp2/transport/http2_status.h",
+    ],
+    external_deps = [
+        "absl/log",
+        "absl/log:check",
+        "absl/status",
+        "absl/strings",
     ],
 )
 
@@ -7571,6 +7577,7 @@ grpc_cc_library(
         "check_class_size",
         "grpc_promise_endpoint",
         "http2_settings",
+        "http2_status",
         "http2_transport",
         "loop",
         "map",
@@ -7618,6 +7625,7 @@ grpc_cc_library(
         "check_class_size",
         "grpc_promise_endpoint",
         "http2_settings",
+        "http2_status",
         "loop",
         "map",
         "message",
@@ -8927,7 +8935,7 @@ grpc_cc_library(
     hdrs = [
         "call/call_finalization.h",
     ],
-    visibility = ["@grpc:alt_grpc_base_legacy"],
+    visibility = ["//bazel:alt_grpc_base_legacy"],
     deps = [
         "arena",
         "call_final_info",
