@@ -18523,6 +18523,7 @@ add_executable(header_assembler_test
   src/core/lib/resource_quota/memory_quota.cc
   src/core/lib/resource_quota/periodic_update.cc
   src/core/lib/resource_quota/resource_quota.cc
+  src/core/lib/resource_quota/stream_quota.cc
   src/core/lib/resource_quota/thread_quota.cc
   src/core/lib/slice/percent_encoding.cc
   src/core/lib/slice/slice.cc
@@ -21266,6 +21267,7 @@ add_executable(message_assembler_test
   src/core/lib/resource_quota/memory_quota.cc
   src/core/lib/resource_quota/periodic_update.cc
   src/core/lib/resource_quota/resource_quota.cc
+  src/core/lib/resource_quota/stream_quota.cc
   src/core/lib/resource_quota/thread_quota.cc
   src/core/lib/slice/percent_encoding.cc
   src/core/lib/slice/slice.cc
