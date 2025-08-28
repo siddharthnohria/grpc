@@ -44,6 +44,7 @@
 #include "src/core/lib/event_engine/extensions/chaotic_good_extension.h"
 #include "src/core/lib/event_engine/query_extensions.h"
 #include "src/core/lib/event_engine/resolved_address_internal.h"
+#include "src/core/lib/event_engine/shim.h"
 #include "src/core/lib/event_engine/tcp_socket_utils.h"
 #include "src/core/lib/event_engine/utils.h"
 #include "src/core/lib/iomgr/error.h"
@@ -126,7 +127,8 @@ absl::StatusOr<int> ChaoticGoodServerListener::Bind(
   auto ee_listener = event_engine_->CreateListener(
       std::move(accept_cb), std::move(shutdown_cb),
       grpc_event_engine::experimental::ChannelArgsEndpointConfig(args_),
-      std::make_unique<MemoryQuota>("chaotic_good_server_listener"));
+      std::make_unique<MemoryQuota>(MakeRefCounted<channelz::ResourceQuotaNode>(
+          "chaotic_good_server_listener")));
   if (!ee_listener.ok()) {
     LOG(ERROR) << "Bind failed: " << ee_listener.status().ToString();
     return ee_listener.status();
@@ -487,7 +489,9 @@ absl::StatusOr<int> AddLegacyChaoticGoodPort(Server* server, std::string addr,
   const std::string parsed_addr = URI::PercentDecode(addr);
   absl::StatusOr<std::vector<EventEngine::ResolvedAddress>> results =
       std::vector<EventEngine::ResolvedAddress>();
-  if (IsEventEngineDnsNonClientChannelEnabled()) {
+  if (IsEventEngineDnsNonClientChannelEnabled() &&
+      !grpc_event_engine::experimental::
+          EventEngineExperimentDisabledForPython()) {
     absl::StatusOr<std::unique_ptr<EventEngine::DNSResolver>> ee_resolver =
         args.GetObjectRef<EventEngine>()->GetDNSResolver(
             EventEngine::DNSResolver::ResolverOptions());

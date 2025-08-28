@@ -51,6 +51,7 @@ enum class Http2ErrorCode : uint8_t {
   kConnectError = 0xa,
   kEnhanceYourCalm = 0xb,
   kInadequateSecurity = 0xc,
+  kHTTP11Required = 0xd,
   kDoNotUse = 0xffu  // Force use of a default clause
 };
 
@@ -75,6 +76,10 @@ inline absl::StatusCode ErrorCodeToAbslStatusCode(
   GPR_UNREACHABLE_CODE(return absl::StatusCode::kUnknown);
 }
 
+inline uint8_t GetMaxHttp2ErrorCode() {
+  return static_cast<uint8_t>(Http2ErrorCode::kHTTP11Required);
+}
+
 inline Http2ErrorCode AbslStatusCodeToErrorCode(const absl::StatusCode status) {
   switch (status) {
     case absl::StatusCode::kOk:
@@ -94,7 +99,7 @@ inline Http2ErrorCode AbslStatusCodeToErrorCode(const absl::StatusCode status) {
   };
 }
 
-class Http2Status {
+class GRPC_MUST_USE_RESULT Http2Status {
  public:
   // Classifying if an error is a stream error or a connection Http2Status must
   // be done at the time of error object creation. Once the Http2Status object
@@ -209,6 +214,11 @@ class Http2Status {
 
   ~Http2Status() = default;
 
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Http2Status& frame) {
+    sink.Append(frame.DebugString());
+  }
+
   Http2Status(Http2Status&& move_status) = default;
 
   // Our http2_code_ code is a const, which makes an assignment illegal.
@@ -318,13 +328,13 @@ class Http2Status {
 };
 
 // We can add more methods and helpers as needed.
-// This class is similar to ValueOrFailure but a more minamilasit version.
+// This class is similar to ValueOrFailure but a more minimalist version.
 // Reference :
 // https://github.com/grpc/grpc/blob/master/src/core/lib/promise/status_flag.h
 
 // A value if an operation was successful, or a Http2Status if not.
 template <typename T>
-class ValueOrHttp2Status {
+class GRPC_MUST_USE_RESULT ValueOrHttp2Status {
  public:
   // NOLINTNEXTLINE(google-explicit-constructor)
   ValueOrHttp2Status(T value) : value_(std::move(value)) {
@@ -346,6 +356,12 @@ class ValueOrHttp2Status {
   GPR_ATTRIBUTE_ALWAYS_INLINE_FUNCTION T& value() {
     DCHECK(std::holds_alternative<T>(value_));
     return std::get<T>(value_);
+  }
+
+  GPR_ATTRIBUTE_ALWAYS_INLINE_FUNCTION static Http2Status TakeStatus(
+      ValueOrHttp2Status<T>&& status) {
+    DCHECK(std::holds_alternative<Http2Status>(status.value_));
+    return std::move(std::get<Http2Status>(status.value_));
   }
 
   GPR_ATTRIBUTE_ALWAYS_INLINE_FUNCTION bool IsOk() const {

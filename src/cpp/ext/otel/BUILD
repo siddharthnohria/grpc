@@ -64,6 +64,7 @@ grpc_cc_library(
     deps = [
         "//:call_tracer",
         "//:config",
+        "//:exec_ctx",
         "//:gpr",
         "//:gpr_platform",
         "//:grpc++",
@@ -78,6 +79,7 @@ grpc_cc_library(
         "//src/core:context",
         "//src/core:down_cast",
         "//src/core:error",
+        "//src/core:event_engine_utils",
         "//src/core:experiments",
         "//src/core:match",
         "//src/core:metadata_batch",

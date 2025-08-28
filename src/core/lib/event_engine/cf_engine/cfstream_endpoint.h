@@ -60,7 +60,13 @@ class CFStreamEndpointImpl
                EventEngine::ResolvedAddress addr);
   bool CancelConnect(absl::Status status);
 
+  void AcceptSocket(absl::AnyInvocable<void(absl::Status)> on_connect,
+                    CFSocketNativeHandle sock,
+                    const EventEngine::ResolvedAddress& addr);
+
  private:
+  void SetupStreams(absl::AnyInvocable<void(absl::Status)> on_connect);
+
   void DoWrite(absl::AnyInvocable<void(absl::Status)> on_writable,
                SliceBuffer* data);
   void DoRead(absl::AnyInvocable<void(absl::Status)> on_read,
@@ -124,12 +130,8 @@ class CFStreamEndpoint : public EventEngine::Endpoint {
     return impl_->GetLocalAddress();
   }
 
-  std::vector<size_t> AllWriteMetrics() override { return {}; }
-  std::optional<absl::string_view> GetMetricName(size_t) override {
-    return std::nullopt;
-  }
-  std::optional<size_t> GetMetricKey(absl::string_view) override {
-    return std::nullopt;
+  std::shared_ptr<TelemetryInfo> GetTelemetryInfo() const override {
+    return nullptr;
   }
 
  public:
@@ -139,6 +141,12 @@ class CFStreamEndpoint : public EventEngine::Endpoint {
   }
   bool CancelConnect(absl::Status status) {
     return impl_->CancelConnect(std::move(status));
+  }
+
+  void AcceptSocket(absl::AnyInvocable<void(absl::Status)> on_connect,
+                    CFSocketNativeHandle sock,
+                    const EventEngine::ResolvedAddress& addr) {
+    return impl_->AcceptSocket(std::move(on_connect), sock, addr);
   }
 
  private:

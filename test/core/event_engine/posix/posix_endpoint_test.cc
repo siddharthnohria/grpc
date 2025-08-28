@@ -78,7 +78,8 @@ std::list<Connection> CreateConnectedEndpoints(
     std::shared_ptr<EventEngine> posix_ee,
     std::shared_ptr<EventEngine> oracle_ee) {
   std::list<Connection> connections;
-  auto memory_quota = std::make_unique<grpc_core::MemoryQuota>("bar");
+  auto memory_quota = std::make_unique<grpc_core::MemoryQuota>(
+      grpc_core::MakeRefCounted<grpc_core::channelz::ResourceQuotaNode>("bar"));
   std::string target_addr = absl::StrCat(
       "ipv6:[::1]:", std::to_string(grpc_pick_unused_port_or_die()));
   auto resolved_addr = URIToResolvedAddress(target_addr);
@@ -105,7 +106,9 @@ std::list<Connection> CreateConnectedEndpoints(
   auto listener = oracle_ee->CreateListener(
       std::move(accept_cb),
       [](absl::Status status) { ASSERT_TRUE(status.ok()); }, config,
-      std::make_unique<grpc_core::MemoryQuota>("foo"));
+      std::make_unique<grpc_core::MemoryQuota>(
+          grpc_core::MakeRefCounted<grpc_core::channelz::ResourceQuotaNode>(
+              "bar")));
   CHECK_OK(listener);
 
   EXPECT_TRUE((*listener)->Bind(*resolved_addr).ok());
@@ -115,7 +118,8 @@ std::list<Connection> CreateConnectedEndpoints(
   for (int i = 0; i < num_connections; ++i) {
     int client_fd = ConnectToServerOrDie(*resolved_addr);
     EventHandle* handle =
-        poller.CreateHandle(client_fd, "test", poller.CanTrackErrors());
+        poller.CreateHandle(poller.posix_interface().Adopt(client_fd), "test",
+                            poller.CanTrackErrors());
     EXPECT_NE(handle, nullptr);
     server_signal->WaitForNotification();
     EXPECT_NE(server_endpoint, nullptr);
@@ -195,29 +199,26 @@ class Worker : public grpc_core::DualRefCounted<Worker> {
 class PosixEndpointTest : public ::testing::TestWithParam<bool> {
   void SetUp() override {
     oracle_ee_ = std::make_shared<PosixOracleEventEngine>();
-    scheduler_ =
-        std::make_unique<grpc_event_engine::experimental::TestScheduler>(
+    thread_pool_ =
+        std::make_shared<grpc_event_engine::experimental::TestThreadPool>(
             posix_ee_.get());
-    EXPECT_NE(scheduler_, nullptr);
-    poller_ = MakeDefaultPoller(scheduler_.get());
+    EXPECT_NE(thread_pool_, nullptr);
+    poller_ = MakeDefaultPoller(thread_pool_);
     posix_ee_ = PosixEventEngine::MakeTestOnlyPosixEventEngine(poller_);
     EXPECT_NE(posix_ee_, nullptr);
-    scheduler_->ChangeCurrentEventEngine(posix_ee_.get());
+    thread_pool_->ChangeCurrentEventEngine(posix_ee_.get());
     if (poller_ != nullptr) {
       LOG(INFO) << "Using poller: " << poller_->Name();
     }
   }
 
   void TearDown() override {
-    if (poller_ != nullptr) {
-      poller_->Shutdown();
-    }
     grpc_core::WaitForSingleOwner(std::move(posix_ee_));
     grpc_core::WaitForSingleOwner(std::move(oracle_ee_));
   }
 
  public:
-  TestScheduler* Scheduler() { return scheduler_.get(); }
+  TestThreadPool* thread_pool() const { return thread_pool_.get(); }
 
   std::shared_ptr<EventEngine> GetPosixEE() { return posix_ee_; }
 
@@ -227,7 +228,7 @@ class PosixEndpointTest : public ::testing::TestWithParam<bool> {
 
  private:
   std::shared_ptr<PosixEventPoller> poller_;
-  std::unique_ptr<TestScheduler> scheduler_;
+  std::shared_ptr<TestThreadPool> thread_pool_;
   std::shared_ptr<EventEngine> posix_ee_;
   std::shared_ptr<EventEngine> oracle_ee_;
 };
